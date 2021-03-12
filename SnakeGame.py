@@ -33,8 +33,8 @@ while key != ESC:
         key = prev_key
 
     #calculate next coordinate for snake
-    y = snake[0] [0]
-    x = snake[0] [1]
+    y = snake[0][0]    
+    x = snake[0][1]
     if key == curses.KEY_DOWN:
         y += 1
     if key == curses.KEY_UP:
@@ -47,7 +47,7 @@ while key != ESC:
     snake.insert(0, (y, x)) # append 0(n)
 
     # check if border hit
-    if y == 0: break
+    if y == 0: break        
     if y == 19: break
     if x == 0: break
     if x == 59: break
