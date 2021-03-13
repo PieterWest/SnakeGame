@@ -4,7 +4,7 @@ from pygame.math import Vector2
 class SNAKE:
     def __init__(self):
         self.body = [Vector2(5,10), Vector2(4,10), Vector2(3,10)]
-        self.direction = Vector2(1,0)
+        self.direction = Vector2(0,0)
         self.new_block_apple = False
         self.new_block_mouse = False
 
@@ -25,6 +25,9 @@ class SNAKE:
         self.body_tl = pygame.image.load('Graphics/SnakeTurnDownLeft3.png').convert_alpha()
         self.body_br = pygame.image.load('Graphics/SnakeTurnUpRight3.png').convert_alpha()
         self.body_bl = pygame.image.load('Graphics/SnakeTurnUpLeft3.png').convert_alpha()
+
+        self.crunch_sound = pygame.mixer.Sound('Sound/apple.wav')
+        self.crunch_mouse = pygame.mixer.Sound('Sound/mouse.wav')
 
     def draw_snake(self):
         self.update_head_graphics()
@@ -101,6 +104,20 @@ class SNAKE:
     def add_block_mouse(self):
         self.new_block_mouse = True
 
+    def play_apple_crunch_sound(self):
+        self.crunch_sound.play()
+
+    def play_mouse_crunch_sound(self):
+        self.crunch_mouse.play()
+
+    def reset_wall(self):
+        self.body = [Vector2(5,10), Vector2(4,10), Vector2(3,10)]
+        self.direction = Vector2(0,0)
+        
+    def reset_self(self):
+        self.body = [Vector2(5,10), Vector2(4,10), Vector2(3,10)]
+        self.direction = Vector2(0,0)
+
 class FRUIT:
     def __init__(self):        
         self.randomize()
@@ -149,23 +166,32 @@ class MAIN:
         if self.fruit.pos == self.snake.body[0]:
             self.fruit.randomize()
             self.snake.add_block_apple()
-        if self.mouse.pos == self.snake.body[0]:
+            self.snake.play_apple_crunch_sound()
+        elif self.mouse.pos == self.snake.body[0]:
             self.mouse.randomize()
             self.snake.add_block_mouse()
+            self.snake.play_mouse_crunch_sound()
             
+        for block in self.snake.body[1:]:
+            if block == self.fruit.pos:
+                self.fruit.randomize()
+            elif block == self.mouse.pos:
+                self.mouse.randomize()
             
 
     def check_fail(self):
         if not 0 <= self.snake.body[0].x < cell_number or not 0 <= self.snake.body[0].y < cell_number:
-            self.game_over()
+            self.game_over_wall()
 
         for block in self.snake.body[1:]:
             if block == self.snake.body[0]:
-                self.game_over()
+                self.game_over_self()
 
-    def game_over(self):
-        pygame.quit()
-        sys.exit()
+    def game_over_self(self):
+        self.snake.reset_self()
+
+    def game_over_wall(self):
+        self.snake.reset_wall()
 
     def draw_grass(self):
         grass_color = (167,209,61)
@@ -184,7 +210,7 @@ class MAIN:
     def draw_score(self):
         score_text = 'Score ' + str((len(self.snake.body) - 3) * 10) 
         score_surface = game_font.render(score_text, True, (56, 74, 12))
-        score_x = int(cell_size * cell_number - 60)
+        score_x = int(cell_size * cell_number - 80)
         score_y = int(cell_size * cell_number - 40)
         score_rect = score_surface.get_rect(center = (score_x, score_y))
         screen.blit(score_surface, score_rect)
