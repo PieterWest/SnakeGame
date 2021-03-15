@@ -1,7 +1,9 @@
-import pygame, sys, random
+import pygame, sys, random, time
 from pygame.math import Vector2
 from menu import *
 from game import Game
+import threading
+from tkinter import *
 
 g = Game()
 
@@ -136,7 +138,7 @@ class FRUIT():
         self.pos = Vector2(self.x, self.y)
 
 class MOUSE():
-    def __init__(self):        
+    def __init__(self):
         self.randomize()
 
     def draw_mouse(self):
@@ -148,9 +150,8 @@ class MOUSE():
         self.y = random.randint(0, cell_number - 1)
         self.pos = Vector2(self.x, self.y)
 
-        
 class MAIN():
-    def __init__(self):           
+    def __init__(self):
         self.snake = SNAKE()
         self.fruit = FRUIT()
         self.mouse = MOUSE()
@@ -160,7 +161,7 @@ class MAIN():
         self.check_collision()
         self.check_fail()               
 
-    def draw_elements(self):                     
+    def draw_elements(self):
         self.draw_grass()
         self.fruit.draw_fruit()    
         self.snake.draw_snake()
